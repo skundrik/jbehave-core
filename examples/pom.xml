@@ -29,6 +29,7 @@
     <module>threads</module>
     <module>urls</module>
     <module>maps</module>
+    <module>meta</module>
     <module>stepdocs</module>
     <module>testng</module>
     <module>i18n</module>

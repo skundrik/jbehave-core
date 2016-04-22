@@ -19,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-import org.apache.commons.lang.BooleanUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.jbehave.core.annotations.AsParameters;
 import org.jbehave.core.configuration.MostUsefulConfiguration;
 import org.jbehave.core.model.ExamplesTable;
@@ -205,7 +205,7 @@ public class ParameterConverters {
      * <li>Long, long: {@link Number#longValue()}</li>
      * <li>Double, double: {@link Number#doubleValue()}</li>
      * <li>BigInteger: {@link BigInteger#valueOf(Long)}</li>
-     * <li>BigDecimal: {@link BigDecimal#valueOf(Double)}</li></li>
+     * <li>BigDecimal: {@link BigDecimal#valueOf(Double)}</li>
      * </ul>
      * If no number format is provided, it defaults to
      * {@link NumberFormat#getInstance(Locale.ENGLISH)}.
@@ -316,12 +316,6 @@ public class ParameterConverters {
                 throw new NumberFormatException("Invalid format, more than one decimal point has been found.");
             }
 
-            boolean isNegative = value.charAt(0) == minusSign;
-
-            if (isNegative) {
-                builder.append('-'); // fixed "-" for BigDecimal constructor
-            }
-
             if (decimalPointPosition != -1) {
                 String sf = value.substring(0, decimalPointPosition).replaceAll(rxNotDigits, "");
                 String dp = value.substring(decimalPointPosition + 1).replaceAll(rxNotDigits, "");
@@ -332,6 +326,12 @@ public class ParameterConverters {
 
             } else {
                 builder.append(value.replaceAll(rxNotDigits, ""));
+            }
+
+            boolean isNegative = value.charAt(0) == minusSign;
+
+            if (isNegative) {
+                builder.setCharAt(0, '-'); // fixed "-" for BigDecimal constructor
             }
             return builder.toString();
         }
@@ -407,7 +407,6 @@ public class ParameterConverters {
         }
 
         /**
-         * @param numberFormat Specific NumberFormat to use.
          * @param valueSeparator A regexp to use as list separate
          */
         public StringListConverter(String valueSeparator) {

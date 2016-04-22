@@ -27,9 +27,15 @@ public class FilteredStory {
         storyAllowed = filter.allow(storyMeta);
         scenariosAllowed = new HashMap<Scenario, Boolean>();
         for (Scenario scenario : story.getScenarios()) {
-            Meta scenarioMeta = scenario.getMeta().inheritFrom(
-                    scenario.asMeta(scenarioMetaPrefix).inheritFrom(storyMeta));
-            boolean scenarioAllowed = filter.allow(scenarioMeta);
+            boolean scenarioAllowed;
+            if (scenario.getExamplesTable().getRowCount() > 0 && metaByRow(scenario, storyControls)) {
+            	// allow filtering on meta by row 
+                scenarioAllowed = true;
+            } else {
+                Meta scenarioMeta = scenario.getMeta().inheritFrom(
+                        scenario.asMeta(scenarioMetaPrefix).inheritFrom(storyMeta));
+                scenarioAllowed = filter.allow(scenarioMeta);
+            }
             scenariosAllowed.put(scenario, scenarioAllowed);
         }
     }
@@ -42,5 +48,13 @@ public class FilteredStory {
     public boolean allowed(Scenario scenario) {
     	if ( alwaysAllowed ) return true;
         return scenariosAllowed.get(scenario);
+    }
+
+    private boolean metaByRow(Scenario scenario, StoryControls storyControls) {
+        if (scenario.getExamplesTable().getProperties().containsKey("metaByRow")) {
+            return scenario.getExamplesTable().metaByRow();
+        }
+
+        return storyControls.metaByRow();
     }
 }

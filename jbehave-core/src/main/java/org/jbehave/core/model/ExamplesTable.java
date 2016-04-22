@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -14,8 +15,8 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.jbehave.core.annotations.Parameter;
 import org.jbehave.core.model.TableTransformers.TableTransformer;
 import org.jbehave.core.steps.ChainedRow;
@@ -126,6 +127,16 @@ import static java.util.regex.Pattern.compile;
  * transformers are already registered by default in {@link TableTransformers}.
  * </p>
  * 
+ * <p>
+ * The table allow filtering on meta by row via the "metaByRow" inlined property:
+ * 
+ * <pre>
+ * {metaByRow=true}
+ * | Meta:       | header 1 | .... | header n |
+ * | @name=value | value 11 | .... | value 1n |
+ * </pre>
+ * 
+ * </p>
  * <p>
  * Once created, the table row can be modified, via the
  * {@link #withRowValues(int, Map)} method, by specifying the map of row values
@@ -345,6 +356,10 @@ public class ExamplesTable {
     public int getRowCount() {
         return data.size();
     }
+    
+    public boolean metaByRow(){
+    	return parseBoolean(properties.getProperty("metaByRow", "false"));        
+    }
 
     public List<Map<String, String>> getRows() {
         List<Map<String, String>> rows = new ArrayList<Map<String, String>>();
@@ -388,7 +403,7 @@ public class ExamplesTable {
             Map<String, String> values = parameters.values();
             for (String name : values.keySet()) {
                 Field field = findField(type, name, fieldNameMapping);
-                Class<?> fieldType = (Class<?>) field.getGenericType();
+                Type fieldType = field.getGenericType();
                 Object value = parameters.valueAs(name, fieldType);
                 field.setAccessible(true);
                 field.set(instance, value);
