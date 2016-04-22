@@ -95,12 +95,12 @@
 		<xsl:param name="element"/>
 			
 		<xsl:choose>
-			<xsl:when test="boolean(count($element[1]/example) > 0)">
+			<xsl:when test="boolean(count($element[1]/ancestor::scenario/example) > 0)">
 				 <xsl:call-template name="example">
 					<xsl:with-param name="failures" select="$failures"/>
 					<xsl:with-param name="ignores" select="$ignores"/>
 					<xsl:with-param name="totalTests" select="$totalTests"/>
-					<xsl:with-param name="element" select="$element[1]/example"/>
+					<xsl:with-param name="element" select="$element[1]/following-sibling::example"/>
 				</xsl:call-template>				 
 			</xsl:when>
 			<xsl:when test="boolean(count($element/ancestor::scenario/following-sibling::scenario) > 0)">
@@ -178,7 +178,7 @@
 					<xsl:with-param name="numberOfFails" select="$numberOfFails"/>
 					<xsl:with-param name="numberSkipped" select="$numberSkipped"/>
 					<xsl:with-param name="testCount" select="$testCount"/>
-					<xsl:with-param name="element" select="$element"/>
+					<xsl:with-param name="element" select="$element/ancestor::scenario"/>
 				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -196,7 +196,7 @@
 			<xsl:variable name="scenarioName" select="@title" />
 			<xsl:choose>
 				<xsl:when test="boolean(child::examples)">
-					<xsl:for-each select="child::examples/example">
+					<xsl:for-each select="child::examples/following-sibling::example">
 					<xsl:variable name="parameters" select="." />
 						<xsl:choose>
 							<xsl:when test="boolean(following-sibling::step[@outcome='failed'][generate-id(preceding-sibling::example[1]) = generate-id(current()) ])">
